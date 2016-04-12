@@ -55,7 +55,7 @@ public class Settings {
                 
         Path localResourcePath = null;
         
-        String configPath = System.getenv().get("TXGH_CONFIG_PATH");        
+        String configPath = System.getenv("TXGH_CONFIG_PATH");
         
         if (configPath != null) {
             Path candidatePath = Paths.get(configPath);
