@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh.util;
+package com.collaborne.build.txgh.util;
 
-import in.drifted.txgh.Settings;
-import in.drifted.txgh.model.GitHubProject;
-import in.drifted.txgh.model.TransifexConfig;
-import in.drifted.txgh.model.TransifexCredentials;
-import in.drifted.txgh.model.TransifexProject;
-import in.drifted.txgh.model.TransifexProjectConfig;
 import java.io.IOException;
+
+import com.collaborne.build.txgh.Settings;
+import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.TransifexConfig;
+import com.collaborne.build.txgh.model.TransifexCredentials;
+import com.collaborne.build.txgh.model.TransifexProject;
+import com.collaborne.build.txgh.model.TransifexProjectConfig;
 
 public class TransifexProjectUtil {
 

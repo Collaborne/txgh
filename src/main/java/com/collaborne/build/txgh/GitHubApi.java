@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh;
+package com.collaborne.build.txgh;
 
-import in.drifted.txgh.model.GitHubCredentials;
-import in.drifted.txgh.model.GitHubProject;
-import in.drifted.txgh.model.GitHubProjectConfig;
-import in.drifted.txgh.model.GitHubUser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -41,6 +37,11 @@ import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.collaborne.build.txgh.model.GitHubCredentials;
+import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.GitHubProjectConfig;
+import com.collaborne.build.txgh.model.GitHubUser;
 
 public class GitHubApi {
 

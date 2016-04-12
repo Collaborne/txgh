@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh;
+package com.collaborne.build.txgh;
 
+import com.collaborne.build.txgh.model.TransifexCredentials;
+import com.collaborne.build.txgh.model.TransifexResource;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import in.drifted.txgh.model.TransifexCredentials;
-import in.drifted.txgh.model.TransifexResource;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh;
+package com.collaborne.build.txgh;
 
-import in.drifted.txgh.model.GitHubProject;
-import in.drifted.txgh.util.TransifexProjectUtil;
-import in.drifted.txgh.model.TransifexProject;
-import in.drifted.txgh.model.TransifexResource;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,6 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.TransifexProject;
+import com.collaborne.build.txgh.model.TransifexResource;
+import com.collaborne.build.txgh.util.TransifexProjectUtil;
 
 public class TransifexServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

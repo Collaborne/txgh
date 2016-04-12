@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh.model;
+package com.collaborne.build.txgh.model;
 
-import in.drifted.txgh.TransifexApi;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.collaborne.build.txgh.TransifexApi;
 
 public class TransifexProject {
 

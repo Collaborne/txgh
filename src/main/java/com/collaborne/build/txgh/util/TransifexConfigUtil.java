@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh.util;
+package com.collaborne.build.txgh.util;
 
-import in.drifted.txgh.Settings;
-import in.drifted.txgh.model.TransifexConfig;
-import in.drifted.txgh.model.TransifexResource;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -29,6 +26,10 @@ import java.util.Map;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 
+import com.collaborne.build.txgh.Settings;
+import com.collaborne.build.txgh.model.TransifexConfig;
+import com.collaborne.build.txgh.model.TransifexResource;
+
 public class TransifexConfigUtil {
 
     public static TransifexConfig getTransifexConfig(String path) throws IOException {
@@ -38,7 +39,7 @@ public class TransifexConfigUtil {
 
         Path localResourcesPath = Settings.getLocalResourcesPath();
         
-        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve(path), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(Settings.CONFIG_PATH + path), StandardCharsets.UTF_8)) {
+        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve(path), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(path), StandardCharsets.UTF_8)) {
         
             Ini ini = new Ini(reader);
 

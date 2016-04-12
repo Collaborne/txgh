@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh.model;
+package com.collaborne.build.txgh.model;
 
-public class GitHubCredentials {
+public class TransifexCredentials {
 
     private final String username;
     private final String password;
 
-    public GitHubCredentials(String username, String password) {
+    public TransifexCredentials(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -31,6 +31,5 @@ public class GitHubCredentials {
 
     public String getPassword() {
         return password;
-    }
-
+    }        
 }

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh;
+package com.collaborne.build.txgh;
 
+import com.collaborne.build.txgh.model.Config;
+import com.collaborne.build.txgh.model.GitHubCredentials;
+import com.collaborne.build.txgh.model.GitHubProjectConfig;
+import com.collaborne.build.txgh.model.TransifexCredentials;
+import com.collaborne.build.txgh.model.TransifexProjectConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import in.drifted.txgh.model.Config;
-import in.drifted.txgh.model.GitHubCredentials;
-import in.drifted.txgh.model.GitHubProjectConfig;
-import in.drifted.txgh.model.TransifexCredentials;
-import in.drifted.txgh.model.TransifexProjectConfig;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh;
+package com.collaborne.build.txgh;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,13 +32,12 @@ import org.eclipse.egit.github.core.TreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.TransifexProject;
+import com.collaborne.build.txgh.model.TransifexResource;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import in.drifted.txgh.model.GitHubProject;
-import in.drifted.txgh.model.TransifexProject;
-import in.drifted.txgh.model.TransifexResource;
 
 public class GitHubServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

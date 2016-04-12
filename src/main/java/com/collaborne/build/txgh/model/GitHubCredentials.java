@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh.model;
+package com.collaborne.build.txgh.model;
 
-import java.util.Map;
+public class GitHubCredentials {
 
-public class TransifexConfig {
+    private final String username;
+    private final String password;
 
-    private final Map<String, String> languageMap;
-    private final Map<String, TransifexResource> resourceMap;
-
-    public TransifexConfig(Map<String, String> languageMap, Map<String, TransifexResource> resourceMap) {
-        this.languageMap = languageMap;
-        this.resourceMap = resourceMap;
+    public GitHubCredentials(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public Map<String, String> getLanguageMap() {
-        return languageMap;
+    public String getUsername() {
+        return username;
     }
 
-    public Map<String, TransifexResource> getResourceMap() {
-        return resourceMap;
+    public String getPassword() {
+        return password;
     }
 
 }

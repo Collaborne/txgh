@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.txgh.model;
+package com.collaborne.build.txgh.model;
 
-import in.drifted.txgh.GitHubApi;
-import in.drifted.txgh.Settings;
-import in.drifted.txgh.util.TransifexProjectUtil;
 import java.io.IOException;
+
+import com.collaborne.build.txgh.GitHubApi;
+import com.collaborne.build.txgh.Settings;
+import com.collaborne.build.txgh.util.TransifexProjectUtil;
 
 public class GitHubProject {
 
