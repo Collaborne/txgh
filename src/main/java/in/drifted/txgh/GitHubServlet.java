@@ -41,6 +41,7 @@ import in.drifted.txgh.model.TransifexProject;
 import in.drifted.txgh.model.TransifexResource;
 
 public class GitHubServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubServlet.class);
     private static final String GITHUB_BASE_URL = "https://github.com/";
