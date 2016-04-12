@@ -34,15 +34,13 @@ import java.util.Map.Entry;
 
 public class Settings {
 
-    public static final String CONFIG_PATH = "/in/drifted/txgh/resources/";
-
     public static Config getConfig() throws IOException {
 
         Config config;
         
         Path localResourcesPath = getLocalResourcesPath();
 
-        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve("config.json"), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(CONFIG_PATH + "config.json"), StandardCharsets.UTF_8)) {
+        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve("config.json"), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream("config.json"), StandardCharsets.UTF_8)) {
             GitHubCredentials defaultGitHubCredentials = getDefaultGitHubCredentials();
             TransifexCredentials defaultTransifexCredentials = getDefaultTransifexCredentials();
 
