@@ -38,15 +38,16 @@ public class TransifexConfigUtil {
 
         Path localResourcesPath = Settings.getLocalResourcesPath();
         
-        Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve(path), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(Settings.CONFIG_PATH + path), StandardCharsets.UTF_8);
+        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve(path), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(Settings.CONFIG_PATH + path), StandardCharsets.UTF_8)) {
         
-        Ini ini = new Ini(reader);
+            Ini ini = new Ini(reader);
 
-        for (String sectionName : ini.keySet()) {
-            if (sectionName.equals("main")) {
-                languageMap.putAll(getLanguageMap(ini.get(sectionName).get("lang_map")));
-            } else {
-                resourceMap.putAll(getResourceMap(sectionName, ini.get(sectionName)));
+            for (String sectionName : ini.keySet()) {
+                if (sectionName.equals("main")) {
+                    languageMap.putAll(getLanguageMap(ini.get(sectionName).get("lang_map")));
+                } else {
+                    resourceMap.putAll(getResourceMap(sectionName, ini.get(sectionName)));
+                }
             }
         }
 
