@@ -18,7 +18,11 @@ package in.drifted.txgh;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import in.drifted.txgh.model.Config;
+import in.drifted.txgh.model.GitHubCredentials;
 import in.drifted.txgh.model.GitHubProjectConfig;
+import in.drifted.txgh.model.TransifexCredentials;
+import in.drifted.txgh.model.TransifexProjectConfig;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -39,12 +43,23 @@ public class Settings {
         Path localResourcesPath = getLocalResourcesPath();
 
         try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve("config.json"), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(CONFIG_PATH + "config.json"), StandardCharsets.UTF_8)) {
-                    
+            GitHubCredentials defaultGitHubCredentials = getDefaultGitHubCredentials();
+            TransifexCredentials defaultTransifexCredentials = getDefaultTransifexCredentials();
+
             Gson gson = new GsonBuilder().create();
             config = gson.fromJson(reader, Config.class);
-            
+
             for (Entry<String, GitHubProjectConfig> entry : config.getGitHubProjectConfigMap().entrySet()) {
                 entry.getValue().setGitHubProjectUrl(entry.getKey());
+                if (entry.getValue().getGitHubCredentials() == null) {
+                    entry.getValue().setGitHubCredentials(defaultGitHubCredentials);
+                }
+            }
+
+            for (Entry<String, TransifexProjectConfig> entry : config.getTransifexProjectConfigMap().entrySet()) {
+                if (entry.getValue().getTransifexCredentials() == null) {
+                    entry.getValue().setTransifexCredentials(defaultTransifexCredentials);
+                }
             }
         }
 
@@ -67,4 +82,31 @@ public class Settings {
         return localResourcePath;
     }
     
+    private static GitHubCredentials getDefaultGitHubCredentials() {
+
+        GitHubCredentials defaultGitHubCredentials = null;
+
+        String defaultGitHubUser = System.getenv("TXGH_DEFAULT_GITHUB_USER");
+        String defaultGitHubPassword = System.getenv("TXGH_DEFAULT_GITHUB_PASSWORD");
+
+        if (defaultGitHubUser != null && defaultGitHubPassword != null) {
+            defaultGitHubCredentials = new GitHubCredentials(defaultGitHubUser, defaultGitHubPassword);
+        }
+
+        return defaultGitHubCredentials;
+    }
+
+    private static TransifexCredentials getDefaultTransifexCredentials() {
+
+        TransifexCredentials defaultTransifexCredentials = null;
+
+        String defaultTransifexUser = System.getenv("TXGH_DEFAULT_TRANSIFEX_USER");
+        String defaultTransifexPassword = System.getenv("TXGH_DEFAULT_TRANSIFEX_PASSWORD");
+
+        if (defaultTransifexUser != null && defaultTransifexPassword != null) {
+            defaultTransifexCredentials = new TransifexCredentials(defaultTransifexUser, defaultTransifexPassword);
+        }
+
+        return defaultTransifexCredentials;
+    }
 }

@@ -18,7 +18,7 @@ package in.drifted.txgh.model;
 public class GitHubProjectConfig {
 
     private String gitHubProjectUrl;
-    private final GitHubCredentials gitHubCredentials;
+    private GitHubCredentials gitHubCredentials;
     private final GitHubUser gitHubUser;
     private final String transifexProjectName;
 
@@ -39,6 +39,10 @@ public class GitHubProjectConfig {
 
     public GitHubCredentials getGitHubCredentials() {
         return gitHubCredentials;
+    }
+
+    public void setGitHubCredentials(GitHubCredentials gitHubCredentials) {
+        this.gitHubCredentials = gitHubCredentials;
     }
 
     public GitHubUser getGitHubUser() {

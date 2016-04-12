@@ -18,7 +18,7 @@ package in.drifted.txgh.model;
 public class TransifexProjectConfig {
 
     private final String transifexConfigPath;
-    private final TransifexCredentials transifexCredentials;
+    private TransifexCredentials transifexCredentials;
     private final String gitHubProjectUrl;
 
     public TransifexProjectConfig(String transifexConfigPath, TransifexCredentials transifexCredentials, String gitHubProjectUrl) {
@@ -33,6 +33,10 @@ public class TransifexProjectConfig {
 
     public TransifexCredentials getTransifexCredentials() {
         return transifexCredentials;
+    }
+
+    public void setTransifexCredentials(TransifexCredentials transifexCredentials) {
+        this.transifexCredentials = transifexCredentials;
     }
 
     public String getGitHubProjectUrl() {
