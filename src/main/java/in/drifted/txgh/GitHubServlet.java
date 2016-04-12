@@ -15,33 +15,37 @@
  */
 package in.drifted.txgh;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import in.drifted.txgh.model.GitHubProject;
-import in.drifted.txgh.model.TransifexProject;
-import in.drifted.txgh.model.TransifexResource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.Tree;
 import org.eclipse.egit.github.core.TreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import in.drifted.txgh.model.GitHubProject;
+import in.drifted.txgh.model.TransifexProject;
+import in.drifted.txgh.model.TransifexResource;
+
 public class GitHubServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubServlet.class);
     private static final String GITHUB_BASE_URL = "https://github.com/";
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         LOGGER.debug("Got some data... processing...");
 

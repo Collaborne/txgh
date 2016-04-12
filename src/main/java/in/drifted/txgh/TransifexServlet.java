@@ -31,7 +31,7 @@ public class TransifexServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransifexServlet.class);
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         LOGGER.debug("Got some data... processing...");
 
