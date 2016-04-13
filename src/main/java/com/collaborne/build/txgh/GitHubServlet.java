@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.TXGHProject;
 import com.collaborne.build.txgh.model.TransifexProject;
 import com.collaborne.build.txgh.model.TransifexResource;
 import com.google.gson.JsonElement;
@@ -66,10 +67,11 @@ public class GitHubServlet extends HttpServlet {
                 JsonObject repository = payloadObject.get("repository").getAsJsonObject();
                 String gitHubProjectName = repository.get("full_name").getAsString();
 
-                GitHubProject gitHubProject = Settings.getGitHubProject(gitHubProjectName);
+                TXGHProject project = Settings.getProject(gitHubProjectName);
+                GitHubProject gitHubProject = project.getGitHubProject();
                 GitHubApi gitHubApi = gitHubProject.getGitHubApi();
                 Repository gitHubRepository = gitHubApi.getRepository();
-                TransifexProject transifexProject = gitHubProject.getTransifexProject();
+                TransifexProject transifexProject = project.getTransifexProject();
 
                 Map<String, TransifexResource> sourceFileMap = transifexProject.getSourceFileMap();
                 Map<String, TransifexResource> updatedTransifexResourceMap = new LinkedHashMap<>();

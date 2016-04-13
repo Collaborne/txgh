@@ -18,9 +18,8 @@ package com.collaborne.build.txgh.model;
 import java.io.IOException;
 
 import com.collaborne.build.txgh.GitHubApi;
-import com.collaborne.build.txgh.Settings;
 
-public class GitHubProject {
+public abstract class GitHubProject {
 
     private final GitHubProjectConfig config;
 
@@ -28,9 +27,7 @@ public class GitHubProject {
         this.config = config;
     }
 
-    public TransifexProject getTransifexProject() throws IOException {
-        return Settings.getTransifexProject(config.getTransifexProjectName());
-    }
+    public abstract TransifexProject getTransifexProject() throws IOException;
     
     public GitHubApi getGitHubApi() {
         return new GitHubApi(config);

@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.TXGHProject;
 import com.collaborne.build.txgh.model.TransifexProject;
 import com.collaborne.build.txgh.model.TransifexResource;
 
@@ -46,7 +47,8 @@ public class TransifexServlet extends HttpServlet {
 
                 LOGGER.debug("Completed...");
 
-                TransifexProject transifexProject = Settings.getTransifexProject(request.getParameter("project"));
+                TXGHProject project = Settings.getProjectByTransifexName(request.getParameter("project"));
+                TransifexProject transifexProject = project.getTransifexProject();
                 TransifexResource transifexResource = transifexProject.getTransifexResource(request.getParameter("resource"));
 
                 String language = request.getParameter("language");
