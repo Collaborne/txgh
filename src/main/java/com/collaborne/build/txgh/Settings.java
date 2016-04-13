@@ -59,6 +59,7 @@ public class Settings {
             }
 
             for (Entry<String, TransifexProjectConfig> entry : config.getTransifexProjectConfigMap().entrySet()) {
+                entry.getValue().setTransifexProject(entry.getKey());
                 if (entry.getValue().getTransifexCredentials() == null) {
                     entry.getValue().setTransifexCredentials(defaultTransifexCredentials);
                 }
@@ -118,7 +119,7 @@ public class Settings {
 		TransifexCredentials transifexCredentials = transifexProjectConfig.getTransifexCredentials();
 		GitHubProject gitHubProject = getGitHubProject(transifexProjectConfig.getGitHubProject());
 
-		return new TransifexProject(projectName, transifexConfig, transifexCredentials, gitHubProject);
+		return new TransifexProject(transifexProjectConfig, transifexConfig, transifexCredentials, gitHubProject);
 	}
 
 	public static GitHubProject getGitHubProject(String projectName) throws IOException {

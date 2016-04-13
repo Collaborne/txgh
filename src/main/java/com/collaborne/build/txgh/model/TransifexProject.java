@@ -22,13 +22,13 @@ import com.collaborne.build.txgh.TransifexApi;
 
 public class TransifexProject {
 
-    private final String projectName;
+    private final TransifexProjectConfig transifexProjectConfig;
     private final TransifexConfig transifexConfig;
     private final TransifexCredentials transifexCredentials;
     private final GitHubProject gitHubProject;
 
-    public TransifexProject(String projectName, TransifexConfig transifexConfig, TransifexCredentials transifexCredentials, GitHubProject gitHubProject) {
-        this.projectName = projectName;
+    public TransifexProject(TransifexProjectConfig transifexProjectConfig, TransifexConfig transifexConfig, TransifexCredentials transifexCredentials, GitHubProject gitHubProject) {
+        this.transifexProjectConfig = transifexProjectConfig;
         this.transifexConfig = transifexConfig;
         this.transifexCredentials = transifexCredentials;
         this.gitHubProject = gitHubProject;
@@ -59,7 +59,7 @@ public class TransifexProject {
     }
 
     public String getProjectName() {
-        return projectName;
+        return transifexProjectConfig.getTransifexProject();
     }
 
     public TransifexCredentials getTransifexCredentials() {
