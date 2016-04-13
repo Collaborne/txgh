@@ -47,7 +47,12 @@ public class TransifexServlet extends HttpServlet {
 
                 LOGGER.debug("Completed...");
 
-                TXGHProject project = Settings.getProjectByTransifexName(request.getParameter("project"));
+                String transifexProjectName = request.getParameter("project");
+                TXGHProject project = Settings.getProjectByTransifexName(transifexProjectName);
+                if (project == null) {
+                    LOGGER.info("Ignoring hook for unknown project '{}'", transifexProjectName);
+                    return;
+                }
                 TransifexProject transifexProject = project.getTransifexProject();
                 TransifexResource transifexResource = transifexProject.getTransifexResource(request.getParameter("resource"));
 

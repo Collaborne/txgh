@@ -62,12 +62,19 @@ public class GitHubServlet extends HttpServlet {
 
             JsonObject payloadObject = new JsonParser().parse(payload).getAsJsonObject();
 
+            // FIXME: Match up with the 'branch' in the TXGHProject
             if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
 
                 JsonObject repository = payloadObject.get("repository").getAsJsonObject();
                 String gitHubProjectName = repository.get("full_name").getAsString();
 
                 TXGHProject project = Settings.getProject(gitHubProjectName);
+                if (project == null) {
+                    // Nothing to do, we don't know this repository
+                    LOGGER.info("Ignoring hook for unknown repository '{}'", gitHubProjectName);
+                    return;
+                }
+
                 GitHubProject gitHubProject = project.getGitHubProject();
                 GitHubApi gitHubApi = gitHubProject.getGitHubApi();
                 Repository gitHubRepository = gitHubApi.getRepository();
