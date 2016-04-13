@@ -19,12 +19,12 @@ public class TransifexProjectConfig {
 
     private final String transifexConfigPath;
     private TransifexCredentials transifexCredentials;
-    private final String gitHubProjectUrl;
+    private final String gitHubProject;
 
-    public TransifexProjectConfig(String transifexConfigPath, TransifexCredentials transifexCredentials, String gitHubProjectUrl) {
+    public TransifexProjectConfig(String transifexConfigPath, TransifexCredentials transifexCredentials, String gitHubProject) {
         this.transifexConfigPath = transifexConfigPath;
         this.transifexCredentials = transifexCredentials;
-        this.gitHubProjectUrl = gitHubProjectUrl;
+        this.gitHubProject = gitHubProject;
     }
 
     public String getTransifexConfigPath() {
@@ -39,8 +39,8 @@ public class TransifexProjectConfig {
         this.transifexCredentials = transifexCredentials;
     }
 
-    public String getGitHubProjectUrl() {
-        return gitHubProjectUrl;
+    public String getGitHubProject() {
+        return gitHubProject;
     }
 
 }

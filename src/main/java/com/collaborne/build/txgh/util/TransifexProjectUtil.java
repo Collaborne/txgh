@@ -31,7 +31,7 @@ public class TransifexProjectUtil {
         TransifexProjectConfig transifexProjectConfig = Settings.getConfig().getTransifexProjectConfigMap().get(projectName);
         TransifexConfig transifexConfig = TransifexConfigUtil.getTransifexConfig(transifexProjectConfig.getTransifexConfigPath());
         TransifexCredentials transifexCredentials = transifexProjectConfig.getTransifexCredentials();
-        GitHubProject gitHubProject = new GitHubProject(transifexProjectConfig.getGitHubProjectUrl());
+        GitHubProject gitHubProject = new GitHubProject(transifexProjectConfig.getGitHubProject());
 
         return new TransifexProject(projectName, transifexConfig, transifexCredentials, gitHubProject);
     }

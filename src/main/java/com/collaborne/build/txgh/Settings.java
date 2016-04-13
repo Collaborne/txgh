@@ -48,7 +48,7 @@ public class Settings {
             config = gson.fromJson(reader, Config.class);
 
             for (Entry<String, GitHubProjectConfig> entry : config.getGitHubProjectConfigMap().entrySet()) {
-                entry.getValue().setGitHubProjectUrl(entry.getKey());
+                entry.getValue().setGitHubProject(entry.getKey());
                 if (entry.getValue().getGitHubCredentials() == null) {
                     entry.getValue().setGitHubCredentials(defaultGitHubCredentials);
                 }

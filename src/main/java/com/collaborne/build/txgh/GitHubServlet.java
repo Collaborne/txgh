@@ -43,7 +43,6 @@ public class GitHubServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubServlet.class);
-    private static final String GITHUB_BASE_URL = "https://github.com/";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -65,12 +64,9 @@ public class GitHubServlet extends HttpServlet {
             if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
 
                 JsonObject repository = payloadObject.get("repository").getAsJsonObject();
-                JsonObject owner = repository.get("owner").getAsJsonObject();
-                String ownerName = owner.get("name").getAsString();
-                String repositoryName = repository.get("name").getAsString();
+                String gitHubProjectName = repository.get("full_name").getAsString();
 
-                String gitHubUrl = GITHUB_BASE_URL + ownerName + "/" + repositoryName;
-                GitHubProject gitHubProject = new GitHubProject(gitHubUrl);
+                GitHubProject gitHubProject = new GitHubProject(gitHubProjectName);
                 GitHubApi gitHubApi = gitHubProject.getGitHubApi();
                 Repository gitHubRepository = gitHubApi.getRepository();
                 TransifexProject transifexProject = gitHubProject.getTransifexProject();

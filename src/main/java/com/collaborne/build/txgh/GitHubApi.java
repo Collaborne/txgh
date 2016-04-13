@@ -46,14 +46,14 @@ import com.collaborne.build.txgh.model.GitHubUser;
 public class GitHubApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubApi.class);
-    private final String gitHubProjectUrl;
+    private final String gitHubProject;
     private final GitHubClient gitHubClient;
     private final RepositoryService repositoryService;
     private final DataService dataService;
     private final CommitUser gitHubCommitUser;
 
     public GitHubApi(GitHubProjectConfig config) {
-        this.gitHubProjectUrl = config.getGitHubProjectUrl();
+        this.gitHubProject = config.getGitHubProject();
 
         GitHubCredentials gitHubCredentials = config.getGitHubCredentials();
         GitHubUser gitHubUser = config.getGitHubUser();
@@ -77,7 +77,7 @@ public class GitHubApi {
     }
 
     public Repository getRepository() throws IOException {
-        return repositoryService.getRepository(RepositoryId.createFromUrl(gitHubProjectUrl));
+        return repositoryService.getRepository(RepositoryId.createFromId(gitHubProject));
     }
 
     public Commit getCommit(Repository repository, String sha) throws IOException {

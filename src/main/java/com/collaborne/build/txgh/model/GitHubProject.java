@@ -23,12 +23,12 @@ import com.collaborne.build.txgh.util.TransifexProjectUtil;
 
 public class GitHubProject {
 
-    private final String projectUrl;
+    private final String project;
     private final GitHubProjectConfig config;
 
-    public GitHubProject(String projectUrl) throws IOException {
-        this.projectUrl = projectUrl;
-        config = Settings.getConfig().getGitHubProjectConfigMap().get(projectUrl);
+    public GitHubProject(String project) throws IOException {
+        this.project = project;
+        config = Settings.getConfig().getGitHubProjectConfigMap().get(project);
     }
 
     public TransifexProject getTransifexProject() throws IOException {
@@ -39,8 +39,8 @@ public class GitHubProject {
         return new GitHubApi(config);
     }
 
-    public String getProjectUrl() {
-        return projectUrl;
+    public String getProject() {
+        return project;
     }
 
 }
