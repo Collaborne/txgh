@@ -55,19 +55,15 @@ public class GitHubServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String event = request.getHeader("X-GitHub-Event");
-        if ("ping".equals(event)) {
-            LOGGER.info("'ping' event: {}", request.getParameter("zen"));
-        } else if ("push".equals(event)) {
-            processPushEvent(request);
-        } else {
+        // Filter out irrelevant events quickly, without costly validation.
+        if (!"ping".equals(event) && !"push".equals(event)) {
             LOGGER.debug("'{}' event ignored", event);
+            return;
         }
-    }
 
-    protected void processPushEvent(HttpServletRequest request) throws IOException {
         String payload = request.getParameter("payload");
         if (payload == null) {
-            LOGGER.warn("'push' event without payload!");
+            LOGGER.error("'{}' event without payload", event);
             return;
         }
 
@@ -127,8 +123,18 @@ public class GitHubServlet extends HttpServlet {
             }
         }
 
+        // Handle the event
+        if ("ping".equals(event)) {
+            LOGGER.info("'ping' event: {}", payloadObject.get("zen").getAsString());
+        } else if ("push".equals(event)) {
+            processPushEvent(project, payloadObject);
+        }
+    }
+
+    protected void processPushEvent(TXGHProject project, JsonObject payloadObject) throws IOException {
         // FIXME: Match up with the 'branch' in the TXGHProject
         if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
+            GitHubProject gitHubProject = project.getGitHubProject();
             GitHubApi gitHubApi = gitHubProject.getGitHubApi();
             Repository gitHubRepository = gitHubApi.getRepository();
             TransifexProject transifexProject = project.getTransifexProject();
