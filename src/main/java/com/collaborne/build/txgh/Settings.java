@@ -76,6 +76,8 @@ public class Settings {
 					String project = rs.getString("project");
 					String name = rs.getString("name");
 					String email = rs.getString("email");
+
+					String secret = rs.getString("secret");
 					String transifexProject = rs.getString("transifexproject");
 
 					String userId = rs.getString("userid");
@@ -87,7 +89,7 @@ public class Settings {
 						gitHubCredentials = getDefaultGitHubCredentials();
 					}
 
-					return new GitHubProjectConfig(project, gitHubCredentials, new GitHubUser(name, email), transifexProject);
+					return new GitHubProjectConfig(project, gitHubCredentials, new GitHubUser(name, email), secret, transifexProject);
 				}
 			}
 		} catch (SQLException e) {

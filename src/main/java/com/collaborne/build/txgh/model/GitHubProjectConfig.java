@@ -20,12 +20,14 @@ public class GitHubProjectConfig {
     private final String gitHubProject;
     private final GitHubCredentials gitHubCredentials;
     private final GitHubUser gitHubUser;
+    private final String gitHubSecret;
     private final String transifexProjectName;
 
-    public GitHubProjectConfig(String gitHubProject, GitHubCredentials gitHubCredentials, GitHubUser gitHubUser, String transifexProjectName) {
+    public GitHubProjectConfig(String gitHubProject, GitHubCredentials gitHubCredentials, GitHubUser gitHubUser, String gitHubSecret, String transifexProjectName) {
         this.gitHubProject = gitHubProject;
         this.gitHubCredentials = gitHubCredentials;
         this.gitHubUser = gitHubUser;
+        this.gitHubSecret = gitHubSecret;
         this.transifexProjectName = transifexProjectName;
     }
 
@@ -39,6 +41,10 @@ public class GitHubProjectConfig {
 
     public GitHubUser getGitHubUser() {
         return gitHubUser;
+    }
+
+    public String getGitHubSecret() {
+        return gitHubSecret;
     }
 
     public String getTransifexProjectName() {

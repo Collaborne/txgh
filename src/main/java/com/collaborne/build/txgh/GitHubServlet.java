@@ -16,11 +16,16 @@
 package com.collaborne.build.txgh;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +47,9 @@ import com.google.gson.JsonParser;
 
 public class GitHubServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+
+    private static final String HMAC_ALGORITHM = "HmacSHA1";
+    private static final String SIGNATURE_SHA1_PREFIX = "sha1=";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubServlet.class);
 
@@ -71,21 +79,56 @@ public class GitHubServlet extends HttpServlet {
         }
 
         JsonObject payloadObject = new JsonParser().parse(payload).getAsJsonObject();
+        JsonObject repository = payloadObject.get("repository").getAsJsonObject();
+        String gitHubProjectName = repository.get("full_name").getAsString();
 
-        // FIXME: Match up with the 'branch' in the TXGHProject
-        if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
+        TXGHProject project = Settings.getProject(gitHubProjectName);
+        if (project == null) {
+            // Nothing to do, we don't know this repository
+            LOGGER.info("Ignoring hook for unknown repository '{}'", gitHubProjectName);
+            return;
+        }
 
-            JsonObject repository = payloadObject.get("repository").getAsJsonObject();
-            String gitHubProjectName = repository.get("full_name").getAsString();
+        GitHubProject gitHubProject = project.getGitHubProject();
 
-            TXGHProject project = Settings.getProject(gitHubProjectName);
-            if (project == null) {
-                // Nothing to do, we don't know this repository
-                LOGGER.info("Ignoring hook for unknown repository '{}'", gitHubProjectName);
+        // Validate the secret, if we have one: either the project has it configured, then it must
+        // also be in the request, or the request has it, and then it must also be configured in the project.
+        String signature = request.getHeader("X-Hub-Signature");
+        if (signature != null) {
+            String secret = gitHubProject.getConfig().getGitHubSecret();
+            if (secret == null) {
+                LOGGER.error("Secret is not configured for repository '{}', but required. Ignoring request", gitHubProjectName);
                 return;
             }
 
-            GitHubProject gitHubProject = project.getGitHubProject();
+            // Parse the signature into a byte array
+            if (!signature.startsWith(SIGNATURE_SHA1_PREFIX)) {
+                LOGGER.error("Unexpected signature type for repository '{}': {}", gitHubProjectName, signature);
+                return;
+            }
+
+            byte[] rawSignature = new byte[20];
+            for (int stringIndex = SIGNATURE_SHA1_PREFIX.length(), rawIndex = 0; stringIndex < signature.length(); stringIndex += 2, rawIndex++) {
+                rawSignature[rawIndex] = (byte) Integer.parseInt(signature.substring(stringIndex, stringIndex + 2), 16);
+            }
+
+            try {
+                SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(), HMAC_ALGORITHM);
+                Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+                mac.init(signingKey);
+                byte[] rawHmac = mac.doFinal(payload.getBytes());
+                if (!MessageDigest.isEqual(rawHmac, rawSignature)) {
+                    LOGGER.error("Invalid signature for repository '{}'", gitHubProjectName);
+                    return;
+                }
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                LOGGER.error("Cannot validate signature", e);
+                return;
+            }
+        }
+
+        // FIXME: Match up with the 'branch' in the TXGHProject
+        if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
             GitHubApi gitHubApi = gitHubProject.getGitHubApi();
             Repository gitHubRepository = gitHubApi.getRepository();
             TransifexProject transifexProject = project.getTransifexProject();
@@ -131,5 +174,4 @@ public class GitHubServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
-
 }

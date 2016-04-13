@@ -15,7 +15,7 @@ Configuration
 For correct functionality it is necessary to set up both Transifex and GitHub hooks in your projects settings. The mapping between both projects is specified in a PostgreSQL database.
 
 ~~~~
-CREATE TABLE github (project VARCHAR PRIMARY KEY, userid VARCHAR, name VARCHAR NOT NULL, email VARCHAR NOT NULL, credentials VARCHAR, transifexproject VARCHAR NOT NULL);
+CREATE TABLE github (project VARCHAR PRIMARY KEY, userid VARCHAR, name VARCHAR NOT NULL, email VARCHAR NOT NULL, credentials VARCHAR, transifexproject VARCHAR NOT NULL, secret VARCHAR);
 CREATE TABLE transifex (project VARCHAR PRIMARY KEY, userid VARCHAR, password VARCHAR, githubproject VARCHAR NOT NULL);
 ~~~~
 
