@@ -117,22 +117,8 @@ public class GitHubServlet extends HttpServlet {
                 return;
             }
 
-            byte[] rawSignature = new byte[20];
-            for (int stringIndex = SIGNATURE_SHA1_PREFIX.length(), rawIndex = 0; stringIndex < signature.length(); stringIndex += 2, rawIndex++) {
-                rawSignature[rawIndex] = (byte) Integer.parseInt(signature.substring(stringIndex, stringIndex + 2), 16);
-            }
-
-            try {
-                SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(), HMAC_ALGORITHM);
-                Mac mac = Mac.getInstance(HMAC_ALGORITHM);
-                mac.init(signingKey);
-                byte[] rawHmac = mac.doFinal(payload.getBytes());
-                if (!MessageDigest.isEqual(rawHmac, rawSignature)) {
-                    LOGGER.error("Invalid signature for repository '{}'", gitHubProjectName);
-                    return;
-                }
-            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-                LOGGER.error("Cannot validate signature", e);
+            if (!validateSignature(payload, secret, signature.substring(SIGNATURE_SHA1_PREFIX.length()))) {
+                LOGGER.error("Invalid signature for repository '{}'", gitHubProjectName);
                 return;
             }
         }
@@ -143,6 +129,27 @@ public class GitHubServlet extends HttpServlet {
         } else if ("push".equals(event)) {
             processPushEvent(project, payloadObject);
         }
+    }
+
+    protected boolean validateSignature(String payload, String secret, String signature) {
+        byte[] rawSignature = new byte[20];
+        for (int stringIndex = 0, rawIndex = 0; stringIndex < signature.length(); stringIndex += 2, rawIndex++) {
+            rawSignature[rawIndex] = (byte) Integer.parseInt(signature.substring(stringIndex, stringIndex + 2), 16);
+        }
+
+        try {
+            SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(), HMAC_ALGORITHM);
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            mac.init(signingKey);
+            byte[] rawHmac = mac.doFinal(payload.getBytes());
+            if (MessageDigest.isEqual(rawHmac, rawSignature)) {
+                return true;
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            LOGGER.error("Cannot validate signature", e);
+        }
+
+        return false;
     }
 
     protected void processPushEvent(TXGHProject project, JsonObject payloadObject) throws IOException {
