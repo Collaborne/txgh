@@ -35,7 +35,7 @@ When this app is deployed to e.g. `https://collaborne-txgh.herokuapp.com/` then:
   * in Transifex project settings
       * set the hook URL to `https://collaborne-txgh.herokuapp.com/transifex`
   * in GitHub project settings
-      * set the webhook to `http://collaborne-txgh.herokuapp.com/github`
+      * set the webhook to `https://collaborne-txgh.herokuapp.com/github`
       * change the content type to `application/x-www-form-urlencoded`
       * set to process just push events
 
