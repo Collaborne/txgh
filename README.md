@@ -41,6 +41,7 @@ The [Transifex configuration file](http://docs.transifex.com/client/config/) spe
 
     [transifex-project.msg]
     file_filter = resources/l10n/msg_<lang>.properties
+    trans.fr = resources/l10/msg_special_fr.properties
     source_file = resources/l10n/msg_en.properties
     source_lang = en
     type = UNICODEPROPERTIES

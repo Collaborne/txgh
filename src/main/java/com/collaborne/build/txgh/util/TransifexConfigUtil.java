@@ -79,7 +79,13 @@ public class TransifexConfigUtil {
 
         String[] ids = sectionName.split("\\.");
         if (ids.length > 1) {
-            resourceMap.put(ids[1], new TransifexResource(ids[0], ids[1], section.get("type"), section.get("source_lang"), section.get("source_file"), section.get("file_filter")));
+            Map<String, String> translationPaths = new HashMap<>();
+            for (Map.Entry<String, String> entry : section.entrySet()) {
+                if (entry.getKey().startsWith("trans.")) {
+                    translationPaths.put(entry.getKey().substring("trans.".length()), entry.getValue());
+                }
+            }
+            resourceMap.put(ids[1], new TransifexResource(ids[0], ids[1], section.get("type"), section.get("source_lang"), section.get("source_file"), section.get("file_filter"), translationPaths));
         }
 
         return resourceMap;

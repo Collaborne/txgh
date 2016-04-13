@@ -15,6 +15,8 @@
  */
 package com.collaborne.build.txgh.model;
 
+import java.util.Map;
+
 public class TransifexResource {
 
     private final String projectSlug;
@@ -23,18 +25,24 @@ public class TransifexResource {
     private final String sourceLanguage;
     private final String sourceFile;
     private final String fileFilter;
+    private final Map<String, String> translationPaths;
 
-    public TransifexResource(String projectSlug, String resourceSlug, String type, String sourceLanguage, String sourceFile, String fileFilter) {
+    public TransifexResource(String projectSlug, String resourceSlug, String type, String sourceLanguage, String sourceFile, String fileFilter, Map<String, String> translationPaths) {
         this.projectSlug = projectSlug;
         this.resourceSlug = resourceSlug;
         this.type = type;
         this.sourceLanguage = sourceLanguage;
         this.sourceFile = sourceFile;
         this.fileFilter = fileFilter;
+        this.translationPaths = translationPaths;
     }
 
     public String getTranslationPath(String language) {
-        return fileFilter.replace("<lang>", language);
+        String result = translationPaths.get(language);
+        if (result == null && fileFilter != null) {
+            result = fileFilter.replace("<lang>", language);
+        }
+        return result;
     }
 
     public String getProjectSlug() {
