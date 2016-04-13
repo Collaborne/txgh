@@ -51,6 +51,7 @@ public class TransifexServlet extends HttpServlet {
                 TXGHProject project = Settings.getProjectByTransifexName(transifexProjectName);
                 if (project == null) {
                     LOGGER.info("Ignoring hook for unknown project '{}'", transifexProjectName);
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
                 TransifexProject transifexProject = project.getTransifexProject();
@@ -68,10 +69,12 @@ public class TransifexServlet extends HttpServlet {
 
             } else {
                 LOGGER.debug("Not yet completed... " + reviewed);
+                response.setStatus(HttpServletResponse.SC_OK);
             }
 
         } else {
             LOGGER.debug("Ignoring unimportant request...");
+            response.setStatus(HttpServletResponse.SC_OK);
         }
     }
 

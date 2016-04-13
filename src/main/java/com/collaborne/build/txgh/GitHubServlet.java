@@ -59,6 +59,7 @@ public class GitHubServlet extends HttpServlet {
         // Filter out irrelevant events quickly, without costly validation.
         if (!"ping".equals(event) && !"push".equals(event)) {
             LOGGER.debug("'{}' event ignored", event);
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
@@ -73,11 +74,13 @@ public class GitHubServlet extends HttpServlet {
             payload = request.getParameter("payload");
         } else {
             LOGGER.error("'{}' event with unexpected content type {}", event, request.getContentType());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         if (payload == null) {
             LOGGER.error("'{}' event without payload", event);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -96,6 +99,7 @@ public class GitHubServlet extends HttpServlet {
         if (project == null) {
             // Nothing to do, we don't know this repository
             LOGGER.info("Ignoring hook for unknown repository '{}'", gitHubProjectName);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
@@ -108,17 +112,20 @@ public class GitHubServlet extends HttpServlet {
             String secret = gitHubProject.getConfig().getGitHubSecret();
             if (secret == null) {
                 LOGGER.error("Secret is not configured for repository '{}', but required. Ignoring request", gitHubProjectName);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
             // Parse the signature into a byte array
             if (!signature.startsWith(SIGNATURE_SHA1_PREFIX)) {
                 LOGGER.error("Unexpected signature type for repository '{}': {}", gitHubProjectName, signature);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
             if (!validateSignature(payload, secret, signature.substring(SIGNATURE_SHA1_PREFIX.length()))) {
                 LOGGER.error("Invalid signature for repository '{}'", gitHubProjectName);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
         }
