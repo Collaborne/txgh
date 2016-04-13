@@ -57,71 +57,68 @@ public class GitHubServlet extends HttpServlet {
     }
 
     protected void processPushEvent(HttpServletRequest request) throws IOException {
-
         String payload = request.getParameter("payload");
+        if (payload == null) {
+            LOGGER.warn("'push' event without payload!");
+            return;
+        }
 
-        if (payload != null) {
+        Map<String, Object> parameterMap = request.getParameterMap();
+        for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
+            if (entry.getValue() instanceof String[]) {
+                LOGGER.debug(entry.getKey() + "::" + Arrays.toString((String[]) entry.getValue()));
+            }
+        }
 
-            Map<String, Object> parameterMap = request.getParameterMap();
-            for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
-                if (entry.getValue() instanceof String[]) {
-                    LOGGER.debug(entry.getKey() + "::" + Arrays.toString((String[]) entry.getValue()));
-                }
+        JsonObject payloadObject = new JsonParser().parse(payload).getAsJsonObject();
+
+        // FIXME: Match up with the 'branch' in the TXGHProject
+        if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
+
+            JsonObject repository = payloadObject.get("repository").getAsJsonObject();
+            String gitHubProjectName = repository.get("full_name").getAsString();
+
+            TXGHProject project = Settings.getProject(gitHubProjectName);
+            if (project == null) {
+                // Nothing to do, we don't know this repository
+                LOGGER.info("Ignoring hook for unknown repository '{}'", gitHubProjectName);
+                return;
             }
 
-            JsonObject payloadObject = new JsonParser().parse(payload).getAsJsonObject();
+            GitHubProject gitHubProject = project.getGitHubProject();
+            GitHubApi gitHubApi = gitHubProject.getGitHubApi();
+            Repository gitHubRepository = gitHubApi.getRepository();
+            TransifexProject transifexProject = project.getTransifexProject();
 
-            // FIXME: Match up with the 'branch' in the TXGHProject
-            if (payloadObject.get("ref").getAsString().equals("refs/heads/master")) {
+            Map<String, TransifexResource> sourceFileMap = transifexProject.getSourceFileMap();
+            Map<String, TransifexResource> updatedTransifexResourceMap = new LinkedHashMap<>();
 
-                JsonObject repository = payloadObject.get("repository").getAsJsonObject();
-                String gitHubProjectName = repository.get("full_name").getAsString();
-
-                TXGHProject project = Settings.getProject(gitHubProjectName);
-                if (project == null) {
-                    // Nothing to do, we don't know this repository
-                    LOGGER.info("Ignoring hook for unknown repository '{}'", gitHubProjectName);
-                    return;
-                }
-
-                GitHubProject gitHubProject = project.getGitHubProject();
-                GitHubApi gitHubApi = gitHubProject.getGitHubApi();
-                Repository gitHubRepository = gitHubApi.getRepository();
-                TransifexProject transifexProject = project.getTransifexProject();
-
-                Map<String, TransifexResource> sourceFileMap = transifexProject.getSourceFileMap();
-                Map<String, TransifexResource> updatedTransifexResourceMap = new LinkedHashMap<>();
-
-                for (JsonElement commitElement : payloadObject.get("commits").getAsJsonArray()) {
-                    JsonObject commitObject = commitElement.getAsJsonObject();
-                    for (JsonElement modified : commitObject.get("modified").getAsJsonArray()) {
-                        String modifiedSourceFile = modified.getAsString();
-                        LOGGER.debug("Modified source file: " + modifiedSourceFile);
-                        if (sourceFileMap.containsKey(modifiedSourceFile)) {
-                            LOGGER.debug("Watched source file has been found: " + modifiedSourceFile);
-                            updatedTransifexResourceMap.put(commitObject.get("id").getAsString(), sourceFileMap.get(modifiedSourceFile));
-                        }
-                    }
-                }
-
-                for (Entry<String, TransifexResource> entry : updatedTransifexResourceMap.entrySet()) {
-
-                    String sourceFile = entry.getValue().getSourceFile();
-                    LOGGER.debug("Modified source file (watched): " + sourceFile);
-                    String treeSha = gitHubApi.getCommitTreeSha(gitHubRepository, entry.getKey());
-                    Tree tree = gitHubApi.getTree(gitHubRepository, treeSha);
-                    for (TreeEntry file : tree.getTree()) {
-                        LOGGER.debug("Repository file: " + file.getPath());
-                        if (sourceFile.equals(file.getPath())) {
-                            transifexProject.getTransifexApi().update(entry.getValue(), gitHubApi.getFileContent(gitHubRepository, file.getSha()));
-                            break;
-                        }
+            for (JsonElement commitElement : payloadObject.get("commits").getAsJsonArray()) {
+                JsonObject commitObject = commitElement.getAsJsonObject();
+                for (JsonElement modified : commitObject.get("modified").getAsJsonArray()) {
+                    String modifiedSourceFile = modified.getAsString();
+                    LOGGER.debug("Modified source file: " + modifiedSourceFile);
+                    if (sourceFileMap.containsKey(modifiedSourceFile)) {
+                        LOGGER.debug("Watched source file has been found: " + modifiedSourceFile);
+                        updatedTransifexResourceMap.put(commitObject.get("id").getAsString(), sourceFileMap.get(modifiedSourceFile));
                     }
                 }
             }
 
-        } else {
-            LOGGER.debug("Ignoring unimportant request...");
+            for (Entry<String, TransifexResource> entry : updatedTransifexResourceMap.entrySet()) {
+
+                String sourceFile = entry.getValue().getSourceFile();
+                LOGGER.debug("Modified source file (watched): " + sourceFile);
+                String treeSha = gitHubApi.getCommitTreeSha(gitHubRepository, entry.getKey());
+                Tree tree = gitHubApi.getTree(gitHubRepository, treeSha);
+                for (TreeEntry file : tree.getTree()) {
+                    LOGGER.debug("Repository file: " + file.getPath());
+                    if (sourceFile.equals(file.getPath())) {
+                        transifexProject.getTransifexApi().update(entry.getValue(), gitHubApi.getFileContent(gitHubRepository, file.getSha()));
+                        break;
+                    }
+                }
+            }
         }
     }
 
