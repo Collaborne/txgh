@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+
 import org.eclipse.egit.github.core.Blob;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitUser;
@@ -39,19 +40,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.collaborne.build.txgh.model.GitHubCredentials;
-import com.collaborne.build.txgh.model.GitHubProject;
 import com.collaborne.build.txgh.model.GitHubProjectConfig;
 import com.collaborne.build.txgh.model.GitHubUser;
 
 public class GitHubApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubApi.class);
+    private final String gitHubProjectUrl;
     private final GitHubClient gitHubClient;
     private final RepositoryService repositoryService;
     private final DataService dataService;
     private final CommitUser gitHubCommitUser;
 
     public GitHubApi(GitHubProjectConfig config) {
+        this.gitHubProjectUrl = config.getGitHubProjectUrl();
 
         GitHubCredentials gitHubCredentials = config.getGitHubCredentials();
         GitHubUser gitHubUser = config.getGitHubUser();
@@ -74,8 +76,8 @@ public class GitHubApi {
         return commitUser;
     }
 
-    public Repository getRepository(String gitHubUrl) throws IOException {
-        return repositoryService.getRepository(RepositoryId.createFromUrl(gitHubUrl));
+    public Repository getRepository() throws IOException {
+        return repositoryService.getRepository(RepositoryId.createFromUrl(gitHubProjectUrl));
     }
 
     public Commit getCommit(Repository repository, String sha) throws IOException {
@@ -99,11 +101,11 @@ public class GitHubApi {
         return blob.getEncoding().equalsIgnoreCase("utf-8") ? blob.getContent() : new String(Base64.getDecoder().decode(blob.getContent().replace("\n", "")), StandardCharsets.UTF_8);
     }
 
-    public void commit(GitHubProject project, String path, String content) throws IOException {
+    public void commit(String path, String content) throws IOException {
 
         LOGGER.debug("Entering commit procedure for path: " + path);
 
-        Repository repository = getRepository(project.getProjectUrl());
+        Repository repository = getRepository();
 
         Blob blob = new Blob();
         blob.setContent(content);

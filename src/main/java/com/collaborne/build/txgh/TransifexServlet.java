@@ -16,10 +16,12 @@
 package com.collaborne.build.txgh;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,7 @@ public class TransifexServlet extends HttpServlet {
                     String translation = new TransifexApi(transifexProject.getTransifexCredentials()).download(transifexResource, language);
                     String path = transifexResource.getTranslationPath(transifexProject.getLanguageData(language));
                     GitHubProject gitHubProject = transifexProject.getGitHubProject();
-                    gitHubProject.getGitHubApi().commit(gitHubProject, path, translation);
+                    gitHubProject.getGitHubApi().commit(path, translation);
                 }
 
             } else {

@@ -72,7 +72,7 @@ public class GitHubServlet extends HttpServlet {
                 String gitHubUrl = GITHUB_BASE_URL + ownerName + "/" + repositoryName;
                 GitHubProject gitHubProject = new GitHubProject(gitHubUrl);
                 GitHubApi gitHubApi = gitHubProject.getGitHubApi();
-                Repository gitHubRepository = gitHubApi.getRepository(gitHubUrl);
+                Repository gitHubRepository = gitHubApi.getRepository();
                 TransifexProject transifexProject = gitHubProject.getTransifexProject();
 
                 Map<String, TransifexResource> sourceFileMap = transifexProject.getSourceFileMap();
