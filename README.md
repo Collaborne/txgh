@@ -40,6 +40,21 @@ When this app is deployed to e.g. `https://collaborne-txgh.herokuapp.com/txgh` t
       * set to process just push events
 
 
+Running on Heroku
+=================
+This application is intended for running on Heroku with an attached PostgreSQL database (schema see above) and these configuration variables:
+
+| Key                               | Value |
+| --------------------------------- | ----- |
+| `TXGH_DEFAULT_GITHUB_USER`        | User to use when `github.userid` is `NULL` for a project |
+| `TXGH_DEFAULT_GITHUB_PASSWORD`    | Password for the default GitHub user |
+| `TXGH_DEFAULT_TRANSIFEX_USER`     | User to use when `transifex.userid` is `NULL` for a project |
+| `TXGH_DEFAULT_TRANSIFEX_PASSWORD` | Password for the default Transifex user |
+| `JDBC_DATABASE_URL`               | (Heroku-provided JDBC URL for the PostgreSQL database) |
+
+
+Note that the `TXGH_DEFAULT...` keys are deprecated, and will be replaced with a dedicated "login with GitHub"/"Authorize Transifex" functionality.
+
 Dependencies
 ============
 This Java app requires JDK 8.
