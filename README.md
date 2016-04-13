@@ -1,4 +1,4 @@
-txgh
+txgh [![Build Status](https://travis-ci.org/Collaborne/txgh.svg?branch=master)](https://travis-ci.org/Collaborne/txgh)
 ====
 Synchronization app for Transifex/GitHub projects.
 
