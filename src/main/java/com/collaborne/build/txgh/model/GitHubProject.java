@@ -22,11 +22,9 @@ import com.collaborne.build.txgh.Settings;
 
 public class GitHubProject {
 
-    private final String project;
     private final GitHubProjectConfig config;
 
-    public GitHubProject(String project, GitHubProjectConfig config) {
-        this.project = project;
+    public GitHubProject(GitHubProjectConfig config) {
         this.config = config;
     }
 
@@ -39,7 +37,7 @@ public class GitHubProject {
     }
 
     public String getProject() {
-        return project;
+        return config.getGitHubProject();
     }
 
 }

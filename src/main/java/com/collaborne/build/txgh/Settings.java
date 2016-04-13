@@ -124,6 +124,6 @@ public class Settings {
 	public static GitHubProject getGitHubProject(String projectName) throws IOException {
 		GitHubProjectConfig gitHubProjectConfig = getConfig().getGitHubProjectConfigMap().get(projectName);
 
-		return new GitHubProject(projectName, gitHubProjectConfig);
+		return new GitHubProject(gitHubProjectConfig);
 	}
 }
