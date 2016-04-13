@@ -15,14 +15,6 @@
  */
 package com.collaborne.build.txgh;
 
-import com.collaborne.build.txgh.model.Config;
-import com.collaborne.build.txgh.model.GitHubCredentials;
-import com.collaborne.build.txgh.model.GitHubProjectConfig;
-import com.collaborne.build.txgh.model.TransifexCredentials;
-import com.collaborne.build.txgh.model.TransifexProjectConfig;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -32,9 +24,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map.Entry;
 
+import com.collaborne.build.txgh.model.Config;
+import com.collaborne.build.txgh.model.GitHubCredentials;
+import com.collaborne.build.txgh.model.GitHubProject;
+import com.collaborne.build.txgh.model.GitHubProjectConfig;
+import com.collaborne.build.txgh.model.TransifexConfig;
+import com.collaborne.build.txgh.model.TransifexCredentials;
+import com.collaborne.build.txgh.model.TransifexProject;
+import com.collaborne.build.txgh.model.TransifexProjectConfig;
+import com.collaborne.build.txgh.util.TransifexConfigUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class Settings {
 
-    public static Config getConfig() throws IOException {
+    private static Config getConfig() throws IOException {
 
         Config config;
         
@@ -107,4 +111,19 @@ public class Settings {
 
         return defaultTransifexCredentials;
     }
+
+	public static TransifexProject getTransifexProject(String projectName) throws IOException {
+		TransifexProjectConfig transifexProjectConfig = getConfig().getTransifexProjectConfigMap().get(projectName);
+		TransifexConfig transifexConfig = TransifexConfigUtil.getTransifexConfig(transifexProjectConfig.getTransifexConfigPath());
+		TransifexCredentials transifexCredentials = transifexProjectConfig.getTransifexCredentials();
+		GitHubProject gitHubProject = getGitHubProject(transifexProjectConfig.getGitHubProject());
+
+		return new TransifexProject(projectName, transifexConfig, transifexCredentials, gitHubProject);
+	}
+
+	public static GitHubProject getGitHubProject(String projectName) throws IOException {
+		GitHubProjectConfig gitHubProjectConfig = getConfig().getGitHubProjectConfigMap().get(projectName);
+
+		return new GitHubProject(projectName, gitHubProjectConfig);
+	}
 }

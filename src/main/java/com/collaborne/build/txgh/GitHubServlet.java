@@ -66,7 +66,7 @@ public class GitHubServlet extends HttpServlet {
                 JsonObject repository = payloadObject.get("repository").getAsJsonObject();
                 String gitHubProjectName = repository.get("full_name").getAsString();
 
-                GitHubProject gitHubProject = new GitHubProject(gitHubProjectName);
+                GitHubProject gitHubProject = Settings.getGitHubProject(gitHubProjectName);
                 GitHubApi gitHubApi = gitHubProject.getGitHubApi();
                 Repository gitHubRepository = gitHubApi.getRepository();
                 TransifexProject transifexProject = gitHubProject.getTransifexProject();

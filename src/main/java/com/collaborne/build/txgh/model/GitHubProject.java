@@ -19,20 +19,19 @@ import java.io.IOException;
 
 import com.collaborne.build.txgh.GitHubApi;
 import com.collaborne.build.txgh.Settings;
-import com.collaborne.build.txgh.util.TransifexProjectUtil;
 
 public class GitHubProject {
 
     private final String project;
     private final GitHubProjectConfig config;
 
-    public GitHubProject(String project) throws IOException {
+    public GitHubProject(String project, GitHubProjectConfig config) {
         this.project = project;
-        config = Settings.getConfig().getGitHubProjectConfigMap().get(project);
+        this.config = config;
     }
 
     public TransifexProject getTransifexProject() throws IOException {
-        return TransifexProjectUtil.getTransifexProject(config.getTransifexProjectName());
+        return Settings.getTransifexProject(config.getTransifexProjectName());
     }
     
     public GitHubApi getGitHubApi() {
