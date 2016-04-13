@@ -12,29 +12,14 @@ Both Transifex and GitHub can send POST requests when specific events happen. Th
 
 Configuration
 =============
-For correct functionality it is necessary to set up both Transifex and GitHub hooks in your projects settings. The mapping between both projects is specified in a special JSON configuration file. 
+For correct functionality it is necessary to set up both Transifex and GitHub hooks in your projects settings. The mapping between both projects is specified in a PostgreSQL database.
 
-This file is stored in `/src/main/resources/in/drifted/txgh/resources/config.json`. It specifies the project name, credentials, the commit user (both name and email address has to match the GitHub account), the project to synchronize and in case of Transifex projects also a special resources configuration file.
+~~~~
+CREATE TABLE github (project VARCHAR PRIMARY KEY, userid VARCHAR, name VARCHAR NOT NULL, email VARCHAR NOT NULL, credentials VARCHAR, transifexproject VARCHAR NOT NULL);
+CREATE TABLE transifex (project VARCHAR PRIMARY KEY, userid VARCHAR, password VARCHAR, githubproject VARCHAR NOT NULL);
+~~~~
 
-    {
-        "gitHubProjectConfigMap" : {
-            "https://github.com/drifted-in/project" : {
-                "gitHubCredentials" : {"username" : "github-user", "password" : "github-password"},
-                "gitHubUser" : {"name" : "github-user-name", "email" : "github-user-email"},
-                "transifexProjectName" : "transifex-project"
-            }
-        },
-
-        "transifexProjectConfigMap" : {
-            "transifex-project" : {
-                "transifexConfigPath" : "transifex-project.cfg",
-                "transifexCredentials" : {"username" : "transifex-user", "password" : "transifex-password"},
-                "gitHubProjectUrl" : "https://github.com/drifted-in/project"
-            }
-        }
-    }
-
-The [Transifex configuration file](http://docs.transifex.com/client/config/) specifies available resources for the given project, file naming conventions and the source file format. Exactly the same configuration file is used by Transifex client application. All these configuration files are supposed to be located in the `/src/main/resources/in/drifted/txgh/resources/` folder.
+The [Transifex configuration file](http://docs.transifex.com/client/config/) specifies available resources for the given project, file naming conventions and the source file format. Exactly the same configuration file is used by Transifex client application. This configuration file must be available at `.tx/config` in the GitHub project tree.
 
     [main]
     host = https://www.transifex.com
@@ -46,29 +31,27 @@ The [Transifex configuration file](http://docs.transifex.com/client/config/) spe
     source_lang = en
     type = UNICODEPROPERTIES
 
-As these configuration files are the part of the compiled code so any changes require a redeployment of the app, think carefully in advance.
-
-When this app is deployed to e.g. `http://drifted.in/txgh` then:
+When this app is deployed to e.g. `https://collaborne-txgh.herokuapp.com/txgh` then:
   * in Transifex project settings
-      * set the hook URL to `http://drifted.in/txgh/transifex`
+      * set the hook URL to `https://collaborne-txgh.herokuapp.com/txgh/transifex`
   * in GitHub project settings
-      * set the webhook to `http://drifted.in/txgh/github` 
+      * set the webhook to `http://collaborne-txgh.herokuapp.com/txgh/github`
       * change the content type to `application/x-www-form-urlencoded`
       * set to process just push events
 
 
 Dependencies
 ============
-This Java app requires JDK 8, but it can be easily backported to JDK 7 if non JDK Base64 decoder is used. In this case just replace `Base64.getDecoder().decode()` with `DatatypeConverter.parseBase64Binary()` in `GitHubApi.getFileContent()` method.
+This Java app requires JDK 8.
 
 All dependencies are specified in the Maven project file. This application relies especially on:
   * Eclipse EGit connector
   * Jersey RESTful client
   * INI4J for parsing INI files
 
-It has been successfully tested on both Apache Tomcat 7 and 8.
+It has been successfully tested on both Apache Tomcat 8.
 
 Acknowledgment
 ==============
-Big thanks belongs to guys behind the https://github.com/jsilland/txgh project. It was a huge source of inspiration!
+The original sources are based on the https://github.com/drifted-in/txgh project.
 

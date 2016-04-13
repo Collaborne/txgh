@@ -16,39 +16,30 @@
 package com.collaborne.build.txgh.util;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 
-import com.collaborne.build.txgh.Settings;
 import com.collaborne.build.txgh.model.TransifexConfig;
 import com.collaborne.build.txgh.model.TransifexResource;
 
 public class TransifexConfigUtil {
 
-    public static TransifexConfig getTransifexConfig(String path) throws IOException {
+    public static TransifexConfig getTransifexConfig(Reader reader) throws IOException {
 
         Map<String, String> languageMap = new HashMap<>();
         Map<String, TransifexResource> resourceMap = new HashMap<>();
 
-        Path localResourcesPath = Settings.getLocalResourcesPath();
-        
-        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve(path), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream(path), StandardCharsets.UTF_8)) {
-        
-            Ini ini = new Ini(reader);
+        Ini ini = new Ini(reader);
 
-            for (String sectionName : ini.keySet()) {
-                if (sectionName.equals("main")) {
-                    languageMap.putAll(getLanguageMap(ini.get(sectionName).get("lang_map")));
-                } else {
-                    resourceMap.putAll(getResourceMap(sectionName, ini.get(sectionName)));
-                }
+        for (String sectionName : ini.keySet()) {
+            if (sectionName.equals("main")) {
+                languageMap.putAll(getLanguageMap(ini.get(sectionName).get("lang_map")));
+            } else {
+                resourceMap.putAll(getResourceMap(sectionName, ini.get(sectionName)));
             }
         }
 

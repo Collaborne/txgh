@@ -17,8 +17,8 @@ package com.collaborne.build.txgh.model;
 
 public class GitHubProjectConfig {
 
-    private String gitHubProject;
-    private GitHubCredentials gitHubCredentials;
+    private final String gitHubProject;
+    private final GitHubCredentials gitHubCredentials;
     private final GitHubUser gitHubUser;
     private final String transifexProjectName;
 
@@ -29,20 +29,12 @@ public class GitHubProjectConfig {
         this.transifexProjectName = transifexProjectName;
     }
 
-    public void setGitHubProject(String gitHubProject) {
-        this.gitHubProject = gitHubProject;
-    }
-
     public String getGitHubProject() {
         return gitHubProject;
     }
 
     public GitHubCredentials getGitHubCredentials() {
         return gitHubCredentials;
-    }
-
-    public void setGitHubCredentials(GitHubCredentials gitHubCredentials) {
-        this.gitHubCredentials = gitHubCredentials;
     }
 
     public GitHubUser getGitHubUser() {

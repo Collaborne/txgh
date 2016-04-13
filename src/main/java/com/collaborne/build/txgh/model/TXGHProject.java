@@ -15,11 +15,23 @@
  */
 package com.collaborne.build.txgh.model;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.Tree;
+import org.eclipse.egit.github.core.TreeEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.collaborne.build.txgh.GitHubApi;
 import com.collaborne.build.txgh.util.TransifexConfigUtil;
 
 public class TXGHProject {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TXGHProject.class);
+
 	private final GitHubProjectConfig gitHubProjectConfig;
 	private final TransifexProjectConfig transifexProjectConfig;
 
@@ -36,10 +48,32 @@ public class TXGHProject {
 		return new GitHubProject(gitHubProjectConfig) {
 			@Override
 			public TransifexProject getTransifexProject() throws IOException {
-				TransifexConfig transifexConfig = TransifexConfigUtil.getTransifexConfig(transifexProjectConfig.getTransifexConfigPath());
-				TransifexCredentials transifexCredentials = transifexProjectConfig.getTransifexCredentials();
+				GitHubApi gitHubApi = getGitHubApi();
+				Repository repository = gitHubApi.getRepository();
 
-				return new TransifexProject(transifexProjectConfig, transifexConfig, transifexCredentials, this);
+				// Find .tx/config in the 'master' of that project
+				// FIXME: We need to handle the branch better!
+				String branch = "master";
+				String txConfigSha = null;
+				Tree tree = gitHubApi.getTree(repository, branch);
+				for (TreeEntry treeEntry : tree.getTree()) {
+					if (".tx/config".equals(treeEntry.getPath())) {
+						txConfigSha = treeEntry.getSha();
+					}
+				}
+
+				if (txConfigSha == null) {
+					LOGGER.error("Cannot find .tx/config in {}#{}", getGitHubProject(), branch);
+					throw new FileNotFoundException("No .tx/config");
+				}
+
+				String txConfig = gitHubApi.getFileContent(repository, txConfigSha);
+				try (Reader reader = new StringReader(txConfig)) {
+					TransifexConfig transifexConfig = TransifexConfigUtil.getTransifexConfig(reader);
+					TransifexCredentials transifexCredentials = transifexProjectConfig.getTransifexCredentials();
+
+					return new TransifexProject(transifexProjectConfig, transifexConfig, transifexCredentials, this);
+				}
 			}
 		};
 	}

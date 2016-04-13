@@ -17,36 +17,22 @@ package com.collaborne.build.txgh.model;
 
 public class TransifexProjectConfig {
 
-    private String transifexProject;
-    private final String transifexConfigPath;
-    private TransifexCredentials transifexCredentials;
+    private final String transifexProject;
+    private final TransifexCredentials transifexCredentials;
     private final String gitHubProject;
 
-    public TransifexProjectConfig(String transifexProject, String transifexConfigPath, TransifexCredentials transifexCredentials, String gitHubProject) {
+    public TransifexProjectConfig(String transifexProject, TransifexCredentials transifexCredentials, String gitHubProject) {
         this.transifexProject = transifexProject;
-        this.transifexConfigPath = transifexConfigPath;
         this.transifexCredentials = transifexCredentials;
         this.gitHubProject = gitHubProject;
     }
 
     public String getTransifexProject() {
         return transifexProject;
-    }
-
-    public void setTransifexProject(String transifexProject) {
-        this.transifexProject = transifexProject;
-    }
-
-    public String getTransifexConfigPath() {
-        return transifexConfigPath;
-    }
+	}
 
     public TransifexCredentials getTransifexCredentials() {
         return transifexCredentials;
-    }
-
-    public void setTransifexCredentials(TransifexCredentials transifexCredentials) {
-        this.transifexCredentials = transifexCredentials;
     }
 
     public String getGitHubProject() {

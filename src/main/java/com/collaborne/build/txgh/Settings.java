@@ -1,5 +1,6 @@
 /* 
  * Copyright (c) 2014 Jan Tošovský <jan.tosovsky.cz@gmail.com>
+ * Copyright (c) 2016 Collaborne B.V. <opensource@collaborne.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,130 +16,151 @@
  */
 package com.collaborne.build.txgh;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map.Entry;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import com.collaborne.build.txgh.model.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.collaborne.build.txgh.model.GitHubCredentials;
 import com.collaborne.build.txgh.model.GitHubProjectConfig;
+import com.collaborne.build.txgh.model.GitHubUser;
 import com.collaborne.build.txgh.model.TXGHProject;
 import com.collaborne.build.txgh.model.TransifexCredentials;
 import com.collaborne.build.txgh.model.TransifexProjectConfig;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class Settings {
+	private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
 
-    private static Config getConfig() throws IOException {
+	private static GitHubCredentials getDefaultGitHubCredentials() {
 
-        Config config;
-        
-        Path localResourcesPath = getLocalResourcesPath();
+		GitHubCredentials defaultGitHubCredentials = null;
 
-        try (Reader reader = localResourcesPath != null ? Files.newBufferedReader(localResourcesPath.resolve("config.json"), StandardCharsets.UTF_8) : new InputStreamReader(Settings.class.getResourceAsStream("config.json"), StandardCharsets.UTF_8)) {
-            GitHubCredentials defaultGitHubCredentials = getDefaultGitHubCredentials();
-            TransifexCredentials defaultTransifexCredentials = getDefaultTransifexCredentials();
+		String defaultGitHubUser = System.getenv("TXGH_DEFAULT_GITHUB_USER");
+		String defaultGitHubPassword = System.getenv("TXGH_DEFAULT_GITHUB_PASSWORD");
 
-            Gson gson = new GsonBuilder().create();
-            config = gson.fromJson(reader, Config.class);
+		if (defaultGitHubUser != null && defaultGitHubPassword != null) {
+			defaultGitHubCredentials = new GitHubCredentials(defaultGitHubUser, defaultGitHubPassword);
+		}
 
-            for (Entry<String, GitHubProjectConfig> entry : config.getGitHubProjectConfigMap().entrySet()) {
-                entry.getValue().setGitHubProject(entry.getKey());
-                if (entry.getValue().getGitHubCredentials() == null) {
-                    entry.getValue().setGitHubCredentials(defaultGitHubCredentials);
-                }
-            }
+		return defaultGitHubCredentials;
+	}
 
-            for (Entry<String, TransifexProjectConfig> entry : config.getTransifexProjectConfigMap().entrySet()) {
-                entry.getValue().setTransifexProject(entry.getKey());
-                if (entry.getValue().getTransifexCredentials() == null) {
-                    entry.getValue().setTransifexCredentials(defaultTransifexCredentials);
-                }
-            }
-        }
+	private static TransifexCredentials getDefaultTransifexCredentials() {
 
-        return config;
-    }
+		TransifexCredentials defaultTransifexCredentials = null;
 
-    public static Path getLocalResourcesPath() {
-                
-        Path localResourcePath = null;
-        
-        String configPath = System.getenv("TXGH_CONFIG_PATH");
-        
-        if (configPath != null) {
-            Path candidatePath = Paths.get(configPath);
-            if (Files.exists(candidatePath)) {
-                localResourcePath = candidatePath;
-            }
-        }
-                
-        return localResourcePath;
-    }
-    
-    private static GitHubCredentials getDefaultGitHubCredentials() {
+		String defaultTransifexUser = System.getenv("TXGH_DEFAULT_TRANSIFEX_USER");
+		String defaultTransifexPassword = System.getenv("TXGH_DEFAULT_TRANSIFEX_PASSWORD");
 
-        GitHubCredentials defaultGitHubCredentials = null;
+		if (defaultTransifexUser != null && defaultTransifexPassword != null) {
+			defaultTransifexCredentials = new TransifexCredentials(defaultTransifexUser, defaultTransifexPassword);
+		}
 
-        String defaultGitHubUser = System.getenv("TXGH_DEFAULT_GITHUB_USER");
-        String defaultGitHubPassword = System.getenv("TXGH_DEFAULT_GITHUB_PASSWORD");
+		return defaultTransifexCredentials;
+	}
 
-        if (defaultGitHubUser != null && defaultGitHubPassword != null) {
-            defaultGitHubCredentials = new GitHubCredentials(defaultGitHubUser, defaultGitHubPassword);
-        }
+	private static Connection getDatabaseConnection() throws SQLException {
+		String dbUrl = System.getenv("JDBC_DATABASE_URL");
+		return DriverManager.getConnection(dbUrl);
+	}
 
-        return defaultGitHubCredentials;
-    }
+	private static GitHubProjectConfig getGitHubProjectConfig(Connection connection, String projectName) {
+		try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM public.github WHERE project = ?")) {
+			stmt.setString(1, projectName);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String project = rs.getString("project");
+					String name = rs.getString("name");
+					String email = rs.getString("email");
+					String transifexProject = rs.getString("transifexproject");
 
-    private static TransifexCredentials getDefaultTransifexCredentials() {
+					String userId = rs.getString("userid");
+					String credentials = rs.getString("credentials");
+					GitHubCredentials gitHubCredentials;
+					if (userId != null && credentials != null) {
+						gitHubCredentials = new GitHubCredentials(userId, credentials);
+					} else {
+						gitHubCredentials = getDefaultGitHubCredentials();
+					}
 
-        TransifexCredentials defaultTransifexCredentials = null;
+					return new GitHubProjectConfig(project, gitHubCredentials, new GitHubUser(name, email), transifexProject);
+				}
+			}
+		} catch (SQLException e) {
+			LOGGER.error("Cannot load github project configuration for '{}': {}", projectName, e.getMessage());
+		}
 
-        String defaultTransifexUser = System.getenv("TXGH_DEFAULT_TRANSIFEX_USER");
-        String defaultTransifexPassword = System.getenv("TXGH_DEFAULT_TRANSIFEX_PASSWORD");
+		return null;
+	}
 
-        if (defaultTransifexUser != null && defaultTransifexPassword != null) {
-            defaultTransifexCredentials = new TransifexCredentials(defaultTransifexUser, defaultTransifexPassword);
-        }
+	private static TransifexProjectConfig getTransifexProjectConfig(Connection connection, String projectName) {
+		try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM public.transifex WHERE project = ?")) {
+			stmt.setString(1, projectName);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String project = rs.getString("project");
+					String gitHubProject = rs.getString("githubproject");
 
-        return defaultTransifexCredentials;
-    }
+					String userId = rs.getString("userid");
+					String password = rs.getString("password");
+					TransifexCredentials transifexCredentials;
+					if (userId != null && password != null) {
+						transifexCredentials = new TransifexCredentials(userId, password);
+					} else {
+						transifexCredentials = getDefaultTransifexCredentials();
+					}
 
-    public static TXGHProject getProject(String projectName) throws IOException {
-        Config config = getConfig();
+					return new TransifexProjectConfig(project, transifexCredentials, gitHubProject);
+				}
+			}
+		} catch (SQLException e) {
+			LOGGER.error("Cannot load transifex project configuration for '{}': {}", projectName, e.getMessage());
+		}
 
-        GitHubProjectConfig gitHubProjectConfig = config.getGitHubProjectConfigMap().get(projectName);
-        if (gitHubProjectConfig == null) {
-            return null;
-        }
+		return null;
+	}
 
-        TransifexProjectConfig transifexProjectConfig = config.getTransifexProjectConfigMap().get(gitHubProjectConfig.getTransifexProjectName());
-        if (transifexProjectConfig == null) {
-            return null;
-        }
+	public static TXGHProject getProject(String projectName) {
+		try (Connection connection = getDatabaseConnection()) {
+			GitHubProjectConfig gitHubProjectConfig = getGitHubProjectConfig(connection, projectName);
+			if (gitHubProjectConfig == null) {
+				return null;
+			}
 
-        return new TXGHProject(gitHubProjectConfig, transifexProjectConfig);
-    }
+			TransifexProjectConfig transifexProjectConfig = getTransifexProjectConfig(connection, gitHubProjectConfig.getTransifexProjectName());
+			if (transifexProjectConfig == null) {
+				return null;
+			}
 
-    public static TXGHProject getProjectByTransifexName(String projectName) throws IOException {
-        Config config = getConfig();
+			return new TXGHProject(gitHubProjectConfig, transifexProjectConfig);
+		} catch (SQLException e) {
+			LOGGER.error("Cannot get a database connection", e);
+		}
 
-        TransifexProjectConfig transifexProjectConfig = config.getTransifexProjectConfigMap().get(projectName);
-        if (transifexProjectConfig == null) {
-            return null;
-        }
+		return null;
+	}
 
-        GitHubProjectConfig gitHubProjectConfig = config.getGitHubProjectConfigMap().get(transifexProjectConfig.getGitHubProject());
-        if (gitHubProjectConfig == null) {
-            return null;
-        }
+	public static TXGHProject getProjectByTransifexName(String projectName) {
+		try (Connection connection = getDatabaseConnection()) {
+			TransifexProjectConfig transifexProjectConfig = getTransifexProjectConfig(connection, projectName);
+			if (transifexProjectConfig == null) {
+				return null;
+			}
 
-        return new TXGHProject(gitHubProjectConfig, transifexProjectConfig);
-    }
+			GitHubProjectConfig gitHubProjectConfig = getGitHubProjectConfig(connection, transifexProjectConfig.getGitHubProject());
+			if (gitHubProjectConfig == null) {
+				return null;
+			}
+
+			return new TXGHProject(gitHubProjectConfig, transifexProjectConfig);
+		} catch (SQLException e) {
+			LOGGER.error("Cannot get a database connection", e);
+		}
+
+		return null;
+	}
 }
