@@ -31,11 +31,11 @@ The [Transifex configuration file](http://docs.transifex.com/client/config/) spe
     source_lang = en
     type = UNICODEPROPERTIES
 
-When this app is deployed to e.g. `https://collaborne-txgh.herokuapp.com/txgh` then:
+When this app is deployed to e.g. `https://collaborne-txgh.herokuapp.com/` then:
   * in Transifex project settings
-      * set the hook URL to `https://collaborne-txgh.herokuapp.com/txgh/transifex`
+      * set the hook URL to `https://collaborne-txgh.herokuapp.com/transifex`
   * in GitHub project settings
-      * set the webhook to `http://collaborne-txgh.herokuapp.com/txgh/github`
+      * set the webhook to `http://collaborne-txgh.herokuapp.com/github`
       * change the content type to `application/x-www-form-urlencoded`
       * set to process just push events
 
