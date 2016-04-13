@@ -15,6 +15,7 @@
  */
 package com.collaborne.build.txgh;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -61,7 +62,20 @@ public class GitHubServlet extends HttpServlet {
             return;
         }
 
-        String payload = request.getParameter("payload");
+        String payload;
+        if ("application/json".equals(request.getContentType())) {
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = request.getReader()) {
+                sb.append(reader.readLine());
+            }
+            payload = sb.toString();
+        } else if ("application/x-www-form-urlencoded".equals(request.getContentType())) {
+            payload = request.getParameter("payload");
+        } else {
+            LOGGER.error("'{}' event with unexpected content type {}", event, request.getContentType());
+            return;
+        }
+
         if (payload == null) {
             LOGGER.error("'{}' event without payload", event);
             return;
