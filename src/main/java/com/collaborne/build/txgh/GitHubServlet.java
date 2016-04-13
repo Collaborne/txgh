@@ -46,8 +46,17 @@ public class GitHubServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitHubServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String event = request.getHeader("X-GitHub-Event");
+        if ("ping".equals(event)) {
+            LOGGER.info("'ping' event: {}", request.getParameter("zen"));
+        } else if ("push".equals(event)) {
+            processPushEvent(request);
+        } else {
+            LOGGER.debug("'{}' event ignored", event);
+        }
+    }
 
-        LOGGER.debug("Got some data... processing...");
+    protected void processPushEvent(HttpServletRequest request) throws IOException {
 
         String payload = request.getParameter("payload");
 
