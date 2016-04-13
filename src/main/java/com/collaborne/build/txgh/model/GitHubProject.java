@@ -33,8 +33,7 @@ public abstract class GitHubProject {
         return new GitHubApi(config);
     }
 
-    public String getProject() {
-        return config.getGitHubProject();
+    public GitHubProjectConfig getConfig() {
+        return config;
     }
-
 }

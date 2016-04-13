@@ -58,8 +58,8 @@ public class TransifexProject {
         return new TransifexApi(transifexCredentials);
     }
 
-    public String getProjectName() {
-        return transifexProjectConfig.getTransifexProject();
+    public TransifexProjectConfig getConfig() {
+        return transifexProjectConfig;
     }
 
     public TransifexCredentials getTransifexCredentials() {
